@@ -20,12 +20,18 @@ namespace paper_io
         public Game(int players)
         {
             gamematrix = new Player[players * 10, players * 10];
-            for (int i = 0; i < players; i++) FindePoint();
+            for (int i = 0; i < players; i++) 
+            { 
+                Point point =  FindPoint();
+                if (point.X == -1 || point.Y == -1)
+                    throw new Exception("Нет свободног места, для создания игрока!");
+                SpawnPlayer(point, new Player());
+            }
         }
         /// <summary>
         /// Ищет сектор 3 на 3 и если он есть, то вызывает метод CreatePlayer.
         /// </summary>
-        public void FindePoint()
+        public Point FindPoint()
         {
             List<Point> locations = new List<Point>();
             for (int originalline = 0; originalline < gamematrix.GetLength(0) - 2; originalline++)
@@ -41,10 +47,9 @@ namespace paper_io
             if (locations.Count() != 0)
             {
                 Random random = new Random();
-                Point location = locations[random.Next(locations.Count())];
-
-                CreatePlayer(location);
+                return locations[random.Next(locations.Count())];
             }
+            return new Point(-1, -1);
         }
         /// <summary>
         /// Проверяет, входит ли подматрица 3 на 3 в главную матрицу игры, начиная с верхнего левого угла.
@@ -67,10 +72,9 @@ namespace paper_io
         /// Создает игрока в подматрице 3 на 3 в центре и с тереторией в подматрицу, начиная с верхнего левого угла.
         /// </summary>
         /// <param name="point">Правая верхняя точка матрицы 3 на 3.</param>
-        private void CreatePlayer(Point point)
+        private void SpawnPlayer(Point point, Player player)
         {
-            Player player = new Player(new Point(point.X + 1, point.Y + 1));
-            players.Add(player);
+            player.Location = new Point(point.X + 1, point.Y + 1);
             for (int i = (int)point.X; i < point.X + 3; i++)
             {
                 for (int j = (int)point.Y; j < (int)point.Y + 3; j++)
